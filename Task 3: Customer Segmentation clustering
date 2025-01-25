@@ -1,0 +1,98 @@
+1. Loading and Preprocessing the Data:
+##
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the datasets
+customers = pd.read_csv("Customers.csv")
+transactions = pd.read_csv("Transactions.csv")
+
+# Merge customer and transaction data (assuming there's a 'customer_id' column to merge on)
+data = pd.merge(customers, transactions, on='customer_id')
+
+# Handle missing values
+data = data.dropna()
+
+# Feature selection or engineering (e.g., total transaction value, frequency of purchase, etc.)
+# Example: Summing transaction amounts for each customer
+data['total_spent'] = data.groupby('customer_id')['transaction_amount'].transform('sum')
+
+# Normalize the data
+features = data[['age', 'income', 'total_spent']]  # Example features
+scaler = StandardScaler()
+features_scaled = scaler.fit_transform(features)
+
+2. Choosing the Clustering Algorithm (K-Means):
+
+from sklearn.cluster import KMeans
+from sklearn.metrics import davies_bouldin_score, silhouette_score
+
+# Run K-Means clustering for a range of cluster numbers (2 to 10)
+db_scores = []
+sil_scores = []
+inertia = []
+n_clusters_range = range(2, 11)
+
+for n_clusters in n_clusters_range:
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    clusters = kmeans.fit_predict(features_scaled)
+    
+    # Calculate clustering metrics
+    db_index = davies_bouldin_score(features_scaled, clusters)
+    silhouette = silhouette_score(features_scaled, clusters)
+    inertia.append(kmeans.inertia_)
+    db_scores.append(db_index)
+    sil_scores.append(silhouette)
+
+# Plot the DB Index and Silhouette Scores
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
+plt.plot(n_clusters_range, db_scores, marker='o')
+plt.title('DB Index vs. Number of Clusters')
+plt.xlabel('Number of Clusters')
+plt.ylabel('DB Index')
+
+plt.subplot(1, 2, 2)
+plt.plot(n_clusters_range, sil_scores, marker='o')
+plt.title('Silhouette Score vs. Number of Clusters')
+plt.xlabel('Number of Clusters')
+plt.ylabel('Silhouette Score')
+
+plt.tight_layout()
+plt.show()
+3. Optimal Clustering (Based on Metrics):
+Based on the DB Index and Silhouette Score, you can select the best number of clusters. Suppose the optimal number of clusters is 4 (as an example).
+
+
+# Run K-Means for the optimal number of clusters (say 4)
+optimal_clusters = 4
+kmeans = KMeans(n_clusters=optimal_clusters, random_state=42)
+clusters = kmeans.fit_predict(features_scaled)
+
+# Add the cluster labels to the data
+data['cluster'] = clusters
+
+# Visualize the clusters using PCA for dimensionality reduction
+pca = PCA(n_components=2)
+reduced_features = pca.fit_transform(features_scaled)
+
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x=reduced_features[:, 0], y=reduced_features[:, 1], hue=data['cluster'], palette='viridis', s=100)
+plt.title(f'Customer Segments (K-Means, {optimal_clusters} Clusters)')
+plt.show()
+4. Clustering Report:
+After running the above code, your report should include the following:
+
+Number of clusters: 4 (example based on evaluation metrics).
+DB Index: A numeric value indicating the quality of the clustering. Lower values are better.
+Silhouette Score: A score indicating how well-separated the clusters are. A higher score is better.
+Inertia: The sum of squared distances between samples and their cluster centroids for each cluster.
+5. Jupyter Notebook/Python Script:
+The code can be written in a Jupyter Notebook, with all the steps above organized into cells. Make sure to include:
+
+Data loading and preprocessing.
+Clustering steps with different algorithms.
+Evaluation metrics and visualization.
