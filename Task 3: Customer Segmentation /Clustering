@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the datasets
-customers = pd.read_csv("Customers.csv")
-transactions = pd.read_csv("Transactions.csv")
+customers = pd.read_csv('C:/Users/USER/Downloads/customers.csv')
+transactions = pd.read_csv('C:/Users/USER/Downloads/Transactions.csv')
+
 
 # Merge customer and transaction data (assuming there's a 'customer_id' column to merge on)
 data = pd.merge(customers, transactions, on='customer_id')
