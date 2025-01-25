@@ -1,0 +1,65 @@
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Load datasets
+customers = pd.read_csv('C:/Users/USER/Downloads/customers.csv')
+products = pd.read_csv('C:/Users/USER/Downloads/Product Dataset.csv')
+transactions = pd.read_csv('C:/Users/USER/Downloads/Transactions.csv')
+
+# Merge datasets
+merged_data = transactions.merge(customers, on='CustomerID').merge(products, on='ProductID')
+
+# Create a customer-product matrix
+customer_product_matrix = merged_data.pivot_table(
+    index='CustomerID',
+    columns='ProductID',
+    values='TotalValue',
+    aggfunc='sum'
+).fillna(0)
+
+# Compute cosine similarity
+similarity_matrix = cosine_similarity(customer_product_matrix)
+
+# Create a similarity DataFrame
+similarity_df = pd.DataFrame(
+    similarity_matrix, 
+    index=customer_product_matrix.index, 
+    columns=customer_product_matrix.index
+)
+
+# Function to get top 3 similar customers for each customer
+def get_top_3_similar_customers(similarity_df, customer_id):
+    similar_customers = similarity_df[customer_id].sort_values(ascending=False).iloc[1:4]
+    return list(zip(similar_customers.index, similar_customers.values))
+
+# Generate recommendations for first 20 customers (C0001 to C0020)
+lookalike_results = {}
+for customer_id in customer_product_matrix.index[:20]:
+    lookalike_results[customer_id] = get_top_3_similar_customers(similarity_df, customer_id)
+
+# Prepare the output DataFrame
+output_data = []
+for customer, recommendations in lookalike_results.items():
+    for similar_customer, score in recommendations:
+        output_data.append([customer, similar_customer, score])
+
+lookalike_df = pd.DataFrame(output_data, columns=['CustomerID', 'SimilarCustomerID', 'SimilarityScore'])
+
+# Save results to CSV
+lookalike_df.to_csv('FirstName_LastName_Lookalike.csv', index=False)
+print("Lookalike model results saved to 'FirstName_LastName_Lookalike.csv'")
+
+1. Feature Engineering:
+    The 'customer_product_matrix' is created where each cell represents the total transaction value of a product purchased by a customer.
+
+2. Cosine Similarity:
+   Measures similarity between customers based on their purchasing patterns. Values range from 0 (no similarity) to 1 (identical).
+
+3. Top-3 Recommendations:
+    For each customer, the top 3 most similar customers are selected based on their similarity scores.
+
+4. Output Format:
+   The CSV file contains three columns: `CustomerID`, 'SimilarCustomerID', and 'SimilarityScore'.
+
+
+
