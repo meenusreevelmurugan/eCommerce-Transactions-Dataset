@@ -1,0 +1,76 @@
+# Import libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load datasets
+customers = pd.read_csv('C:/Users/USER/Downloads/customers.csv')
+products = pd.read_csv('C:/Users/USER/Downloads/Product Dataset.csv')
+transactions = pd.read_csv('C:/Users/USER/Downloads/Transactions.csv')
+
+
+# Display basic info about datasets
+print("Customers Dataset:")
+print(customers.info())
+print(customers.head())
+
+print("\nProducts Dataset:")
+print(products.info())
+print(products.head())
+
+print("\nTransactions Dataset:")
+print(transactions.info())
+print(transactions.head())
+
+# Check for missing or duplicate values
+print("\nMissing Values:")
+print("Customers:", customers.isnull().sum())
+print("Products:", products.isnull().sum())
+print("Transactions:", transactions.isnull().sum())
+
+print("\nDuplicate Values:")
+print("Customers:", customers.duplicated().sum())
+print("Products:", products.duplicated().sum())
+print("Transactions:", transactions.duplicated().sum())
+
+# Merge datasets
+merged_data = transactions.merge(customers, on='CustomerID').merge(products, on='ProductID')
+print("\nMerged Dataset:")
+print(merged_data.info())
+print(merged_data.head())
+
+# Analyze transactions by region
+region_sales = merged_data.groupby('Region')['TotalValue'].sum().reset_index()
+print("\nTotal Sales by Region:")
+print(region_sales)
+
+# Visualize sales by region
+sns.barplot(x='Region', y='TotalValue', data=region_sales)
+plt.title("Total Sales by Region")
+plt.xlabel("Region")
+plt.ylabel("Total Sales (USD)")
+plt.show()
+
+# Analyze top-selling products
+top_products = merged_data.groupby('ProductName')['TotalValue'].sum().sort_values(ascending=False).head(10)
+print("\nTop 10 Best-Selling Products:")
+print(top_products)
+
+# Visualize top-selling products
+sns.barplot(x=top_products.values, y=top_products.index, palette="viridis")
+plt.title("Top 10 Best-Selling Products")
+plt.xlabel("Total Sales (USD)")
+plt.ylabel("Product Name")
+plt.show()
+
+# Analyze customer transaction trends
+top_customers = merged_data.groupby('CustomerName')['TotalValue'].sum().sort_values(ascending=False).head(10)
+print("\nTop 10 Customers by Total Spending:")
+print(top_customers)
+
+# Visualize customer spending
+sns.barplot(x=top_customers.values, y=top_customers.index, palette="coolwarm")
+plt.title("Top 10 Customers by Total Spending")
+plt.xlabel("Total Spending (USD)")
+plt.ylabel("Customer Name")
+plt.show()
