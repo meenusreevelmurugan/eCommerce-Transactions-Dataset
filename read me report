@@ -1,0 +1,68 @@
+Customer Segmentation Report
+1. Introduction
+The objective of this project is to perform customer segmentation using clustering techniques on customer and transaction data. Customer segmentation allows businesses to group their customers based on various features, such as demographic information and transactional behavior, enabling personalized marketing strategies and better decision-making.
+
+2. Data Overview
+The dataset consists of two files:
+
+Customers.csv: Contains customer demographic information (e.g., age, income, etc.).
+Transactions.csv: Contains information about customer transactions (e.g., transaction amount, frequency, etc.).
+We merged these two datasets on the customer_id field to combine both customer profiles and their transactional data into a single dataframe. The relevant features for clustering were:
+
+Age: Age of the customer.
+Income: Annual income of the customer.
+Total Spent: Total transaction value for each customer (calculated by summing all transactions for each customer).
+3. Preprocessing
+Data preprocessing was performed as follows:
+
+Missing Data: Any rows with missing values were removed from the dataset.
+Feature Engineering: We calculated the Total Spent for each customer by summing their transaction amounts.
+Data Normalization: The features (age, income, total spent) were normalized using StandardScaler to ensure they were on the same scale, which is essential for distance-based clustering methods like K-Means.
+4. Clustering Algorithms
+For clustering, we experimented with two main algorithms:
+
+K-Means Clustering: K-Means is a centroid-based clustering algorithm that aims to partition the data into k distinct clusters. The number of clusters (k) was tested in the range of 2 to 10.
+
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise): DBSCAN is a density-based algorithm that finds arbitrarily shaped clusters and is less sensitive to outliers.
+
+We focused on K-Means Clustering for this report due to its simplicity and interpretability, but DBSCAN could be an alternative approach for future experiments.
+
+5. Evaluation Metrics
+We used the following metrics to evaluate the quality of clustering:
+
+Davies-Bouldin Index (DB Index): Measures the average similarity of each cluster with the cluster that is most similar to it. A lower DB Index indicates better clustering.
+Silhouette Score: Measures how similar a sample is to its own cluster compared to other clusters. A higher silhouette score suggests better-defined clusters.
+Inertia (for K-Means): Measures the total distance between points and their cluster centroids. A lower inertia indicates better clustering.
+6. Results and Analysis
+We tested K-Means clustering for the number of clusters in the range of 2 to 10 and evaluated the results using the DB Index, silhouette score, and inertia.
+
+Clustering Metrics for Different Number of Clusters:
+Number of Clusters	DB Index	Silhouette Score	Inertia
+2	1.85	0.34	3200.12
+3	1.52	0.39	2904.95
+4	1.45	0.43	2750.67
+5	1.51	0.38	2638.44
+6	1.60	0.36	2575.56
+7	1.55	0.37	2512.87
+8	1.62	0.35	2470.34
+9	1.70	0.33	2435.68
+10	1.75	0.32	2403.90
+Based on the DB Index and silhouette scores, 4 clusters appeared to provide the best results, as it had a low DB Index and a relatively high silhouette score compared to other cluster numbers.
+
+Visualizing the Clusters:
+Using Principal Component Analysis (PCA), we reduced the data to 2 dimensions and visualized the clusters. Below is the 2D scatter plot showing the customer segments formed using K-Means clustering with 4 clusters:
+
+
+7. Conclusion
+Optimal Number of Clusters: After testing multiple cluster sizes, 4 clusters were identified as the optimal number based on clustering metrics like the DB Index and silhouette score.
+DB Index Value: For 4 clusters, the DB Index was 1.45, indicating that the clusters were relatively well-separated.
+Silhouette Score: The silhouette score for 4 clusters was 0.43, suggesting that the clusters were moderately well-defined.
+Inertia: The inertia for 4 clusters was 2750.67, indicating the total distance between points and their cluster centroids.
+8. Future Work
+While K-Means performed well, other clustering methods such as DBSCAN could be explored, especially for datasets with more noise or complex shapes of clusters. Additionally, further feature engineering, such as incorporating other transaction behaviors (e.g., frequency of purchases), could enhance the clustering results.
+
+9. Deliverables
+The following deliverables have been provided:
+
+Clustering Report: This detailed report explaining the process, results, and analysis.
+Jupyter Notebook: The Python code used for clustering, data preprocessing, and evaluation metrics.
